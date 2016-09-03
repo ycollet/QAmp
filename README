@@ -1,0 +1,23 @@
+A simple Qt5 / Qt4 plugin (an amplifier with a Qt5 / Qt4 GUI or a ttl GUI).
+
+To build the plugin:
+```
+$ make -f Makefile.qt4
+$ sudo make -f Makefile.qt4 INSTALL_DIR=/usr/lib64/lv2 install
+```
+
+To build the Qt5 version of the plugin:
+```
+$ make -f Makefile.qt5
+$ sudo make -f Makefile.qt5 INSTALL_DIR=/usr/lib64/lv2 install
+```
+
+To load the plugin:
+```
+$ jalv.qt https://github.com/ycollet/qamp
+or
+$ jalv.qt4 https://github.com/ycollet/qamp
+or
+$ jalv.qt5 https://github.com/ycollet/qamp
+```
+
