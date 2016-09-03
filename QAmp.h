@@ -14,7 +14,7 @@ class QAmp : public QWidget
 Q_OBJECT
 
 public:
-  QAmp();
+  QAmp(QWidget *parent);
   void set_volume(float volume);
   float get_volume() const;
   void set_controller(LV2UI_Controller func);
@@ -22,7 +22,7 @@ public:
 private slots:
   void volumeChanged(int value);
 private:
-  QSpinBox *qampValue;
+  QDial *qampValue;
   float gain;
   LV2UI_Controller controller;
   LV2UI_Write_Function write_function;

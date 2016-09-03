@@ -1,18 +1,17 @@
-@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix doap: <http://usefulinc.com/ns/doap#> .
-@prefix ui:   <http://lv2plug.in/ns/extensions/ui#>.
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix lv2ui: <http://lv2plug.in/ns/extensions/ui#>.
 
-<https://github.com/ycollet/qamp/gui>
-    a ui:QtUI;
-    ui:binary <qamp_gui.so>;
-    ui:requiredFeature ui:makeResident.
+<https://github.com/ycollet/qamp#ui>
+    a lv2ui:Qt4UI;
+    lv2ui:binary <qamp_gui.so> .
 
 <https://github.com/ycollet/qamp> a lv2:Plugin ;
     doap:name "Simple Qt amplifier" ;
     doap:license <http://usefulinc.com/doap/licenses/gpl> ;
     lv2:optionalFeature lv2:hardRtCapable ;
-    ui:ui <https://github.com/ycollet/qamp/gui>;
+    lv2ui:ui <https://github.com/ycollet/qamp#ui>;
 
     lv2:port [
 	a lv2:InputPort ;

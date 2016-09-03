@@ -1,5 +1,5 @@
 #define QAMP_URI    "https://github.com/ycollet/qamp"
-#define QAMP_UI_URI "https://github.com/ycollet/qamp/gui"
+#define QAMP_UI_URI "https://github.com/ycollet/qamp#ui"
 
 #define QAMP_N_PORTS   3
 

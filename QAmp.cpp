@@ -3,20 +3,27 @@
 #include "amp.h"
 #include "QAmp.h"
 
-QAmp::QAmp() {
-  qampValue = new QSpinBox;
-  qampValue->setRange(0, 100);
+QAmp::QAmp(QWidget *parent) : QWidget(parent) {
+  setFixedHeight(100);
+  setFixedWidth(100);
+  
+  qampValue = new QDial(this);
+  qampValue->setRange(-100, 100);
   qampValue->setSingleStep(1);
-    
-  QVBoxLayout *controlsLayout = new QVBoxLayout;
-  controlsLayout->addWidget(qampValue);
+  qampValue->setValue(90);
+  gain = 90.0;
 
-  qampValue->setValue(100);
-  gain = 100.0;
+  QVBoxLayout *vLayout = new QVBoxLayout(this);
+  vLayout->addStretch(1);
+  vLayout->addWidget(qampValue);
+
+  this->setLayout(vLayout);
   
   setWindowTitle(tr("QAmp"));
 
-  connect(this, SIGNAL(valueChanged(int)), this, SLOT(volumeChanged(int)));
+  update();
+  
+  connect(qampValue, SIGNAL(valueChanged(int)), this, SLOT(volumeChanged(int)));
 }
 
 void QAmp::set_volume(float volume) {

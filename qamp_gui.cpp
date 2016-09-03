@@ -13,8 +13,8 @@ static LV2UI_Widget make_gui(LV2UI_Controller controller,
 			 LV2UI_Write_Function write_function) {
   std::cerr << "DEBUG: make_gui called" << std::endl;
   
-  QAmp * widget = new QAmp();
-  
+  QAmp * widget = new QAmp(NULL);
+
   widget->set_controller(controller);
   widget->set_write_function(write_function);
   widget->show();
@@ -76,7 +76,7 @@ static const LV2UI_Descriptor descriptor = {
 
 LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 {
-  std::cerr << "DEBUG: lv2ui_descriptor called" << std::endl;
+  std::cerr << "DEBUG: lv2ui_descriptor called - index = " << index << " - descriptor = " << &descriptor << std::endl;
   
   switch (index) {
   case 0:

@@ -15,14 +15,14 @@ moc_QAmp.cpp: QAmp.h
 	moc-qt4 $(DEFINES) $(INCPATH) $< -o $@
 
 qamp.so: amp.c
-	gcc -shared -fPIC -DPIC amp.c `pkg-config --cflags --libs lv2core` -o qamp.so
+	gcc -g -shared -fPIC -DPIC amp.c `pkg-config --cflags --libs lv2core` -o qamp.so
 
 qamp_gui.so: qamp_gui.cpp QAmp.o
-	g++ -shared -fPIC -DPIC qamp_gui.cpp `pkg-config --cflags --libs QtGui` `pkg-config --cflags --libs lv2core` QAmp.o moc_QAmp.o -o qamp_gui.so
+	g++ -g -shared -fPIC -DPIC qamp_gui.cpp `pkg-config --cflags --libs QtGui` `pkg-config --cflags --libs lv2core` QAmp.o moc_QAmp.o -o qamp_gui.so
 
 QAmp.o: QAmp.cpp moc_QAmp.cpp QAmp.h
-	g++ -c -fPIC -DPIC QAmp.cpp `pkg-config --cflags --libs QtGui` -o QAmp.o
-	g++ -c -fPIC -DPIC moc_QAmp.cpp `pkg-config --cflags --libs QtGui` -o moc_QAmp.o
+	g++ -g -c -fPIC -DPIC QAmp.cpp `pkg-config --cflags --libs QtGui` -o QAmp.o
+	g++ -g -c -fPIC -DPIC moc_QAmp.cpp `pkg-config --cflags --libs QtGui` -o moc_QAmp.o
 
 install: $(BUNDLE)
 	mkdir -p $(INSTALL_DIR)
