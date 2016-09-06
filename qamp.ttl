@@ -4,8 +4,10 @@
 @prefix lv2ui: <http://lv2plug.in/ns/extensions/ui#>.
 
 <https://github.com/ycollet/qamp#ui>
+    a lv2ui:Qt5UI;
+    lv2ui:binary <qamp_gui_qt5.so> ;
     a lv2ui:Qt4UI;
-    lv2ui:binary <qamp_gui.so> .
+    lv2ui:binary <qamp_gui_qt4.so> .
 
 <https://github.com/ycollet/qamp> a lv2:Plugin ;
     doap:name "Simple Qt amplifier" ;

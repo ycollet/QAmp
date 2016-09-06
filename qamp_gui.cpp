@@ -1,24 +1,26 @@
 #include <iostream>
 
+#include <QApplication>
+#include <QDebug>
+
 #include <lv2/lv2plug.in/ns/extensions/ui/ui.h>
 
 #include "amp.h"
 #include "QAmp.h"
 
-typedef struct {
-  LV2UI_Widget volume_control;
-} QAmpGui;
+static QApplication *qamp_qapp_instance = NULL;
+static unsigned int  qamp_qapp_refcount = 0;
 
 static LV2UI_Widget make_gui(LV2UI_Controller controller,
 			 LV2UI_Write_Function write_function) {
-  std::cerr << "DEBUG: make_gui called" << std::endl;
+  qDebug() << "make_gui called";
   
   QAmp * widget = new QAmp(NULL);
 
   widget->set_controller(controller);
   widget->set_write_function(write_function);
   widget->show();
-  
+
   return (LV2UI_Widget)widget;
 }
 
@@ -29,25 +31,33 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 				LV2UI_Controller controller,
 				LV2UI_Widget * widget,
 				const LV2_Feature * const * features) {
-  std::cerr << "DEBUG: instanciate called" << std::endl;
+  qDebug() << "instanciate called";
   
   if (strcmp(plugin_uri, QAMP_URI) != 0) {
     std::cerr << "QAMP_UI error: this GUI does not support plugin with URI " << plugin_uri << std::endl;
     return NULL;
   }
+
+  if (qamp_qapp_instance == NULL) {
+    static int s_argc = 1;
+    static const char *s_argv[] = { __func__, NULL };
+    qamp_qapp_instance = new QApplication(s_argc, (char **) s_argv);
+  }
+  qamp_qapp_refcount++;
   
-  QAmpGui* pluginGui = (QAmpGui*)malloc(sizeof(QAmpGui));
-  if (pluginGui == NULL) return NULL;
-  
-  pluginGui->volume_control = (LV2UI_Widget)make_gui(controller, write_function);
-  return (LV2UI_Handle)pluginGui;
+  return (LV2UI_Handle)make_gui(controller, write_function);
 }
 
 static void cleanup(LV2UI_Handle ui) {
-  std::cerr << "DEBUG: cleanup called" << std::endl;
-  
-  QAmpGui *pluginGui = (QAmpGui *) ui;
-  free(pluginGui);
+  qDebug() << "cleanup called";
+  QWidget *pWidget = static_cast<QWidget *> (ui);
+  if (pWidget) {
+    delete pWidget;
+    if (--qamp_qapp_refcount == 0 && qamp_qapp_instance) {
+      delete qamp_qapp_instance;
+      qamp_qapp_instance = NULL;
+    }
+  }
 }
 
 static void port_event(LV2UI_Handle ui,
@@ -55,15 +65,14 @@ static void port_event(LV2UI_Handle ui,
 		       uint32_t buffer_size,
 		       uint32_t format,
 		       const void * buffer) {
-  std::cerr << "DEBUG: port_event_called" << std::endl;
+  qDebug() << "port_event_called";
   
-  QAmpGui *pluginGui = (QAmpGui *)ui;
   float * pval = (float *)buffer;
     
   if (format != 0) return;
   if ((port_index < 0) || (port_index >= QAMP_N_PORTS)) return;
 
-  ((QAmp *)pluginGui->volume_control)->set_volume(*pval);
+  ((QAmp *)ui)->set_volume(*pval);
 }
 
 static const LV2UI_Descriptor descriptor = {
@@ -76,7 +85,7 @@ static const LV2UI_Descriptor descriptor = {
 
 LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 {
-  std::cerr << "DEBUG: lv2ui_descriptor called - index = " << index << " - descriptor = " << &descriptor << std::endl;
+  qDebug() << "lv2ui_descriptor called - index = " << index << " - descriptor = " << &descriptor;
   
   switch (index) {
   case 0:

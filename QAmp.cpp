@@ -1,9 +1,11 @@
 #include <iostream>
 
+#include <QDebug>
+
 #include "amp.h"
 #include "QAmp.h"
 
-QAmp::QAmp(QWidget *parent) : QWidget(parent) {
+QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
   setFixedHeight(100);
   setFixedWidth(100);
   
@@ -20,8 +22,6 @@ QAmp::QAmp(QWidget *parent) : QWidget(parent) {
   this->setLayout(vLayout);
   
   setWindowTitle(tr("QAmp"));
-
-  update();
   
   connect(qampValue, SIGNAL(valueChanged(int)), this, SLOT(volumeChanged(int)));
 }
@@ -45,5 +45,4 @@ void QAmp::set_write_function(LV2UI_Write_Function func) {
 void QAmp::volumeChanged(int value) {
   gain = (float)value;
   write_function(controller, QAMP_GAIN, sizeof(gain), 0, &gain);
-  std::cerr << "DEBUG: gain = " << value << std::endl;
 }
