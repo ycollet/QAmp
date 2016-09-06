@@ -75,7 +75,7 @@ static void port_event(LV2UI_Handle ui,
   ((QAmp *)ui)->set_volume(*pval);
 }
 
-static const LV2UI_Descriptor descriptor = {
+static const LV2UI_Descriptor descriptor_qt5 = {
   QAMP_UI_URI, // URI
   instantiate, // instanciate function
   cleanup,     // cleanup function

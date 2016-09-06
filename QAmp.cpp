@@ -9,21 +9,21 @@ QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
   setFixedHeight(100);
   setFixedWidth(100);
   
-  qampValue = new QDial(this);
+  qampValue = new QDial();
   qampValue->setRange(-100, 100);
   qampValue->setSingleStep(1);
   qampValue->setValue(90);
   gain = 90.0;
-
-  QVBoxLayout *vLayout = new QVBoxLayout(this);
+  
+  QObject::connect(qampValue, SIGNAL(valueChanged(int)), this, SLOT(volumeChanged(int)));
+  
+  QVBoxLayout *vLayout = new QVBoxLayout();
   vLayout->addStretch(1);
   vLayout->addWidget(qampValue);
-
-  this->setLayout(vLayout);
+  
+  setLayout(vLayout);
   
   setWindowTitle(tr("QAmp"));
-  
-  connect(qampValue, SIGNAL(valueChanged(int)), this, SLOT(volumeChanged(int)));
 }
 
 void QAmp::set_volume(float volume) {
