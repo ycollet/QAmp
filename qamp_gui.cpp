@@ -45,7 +45,9 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
   }
   qamp_qapp_refcount++;
   
-  return (LV2UI_Handle)make_gui(controller, write_function);
+  *widget = (LV2UI_Widget)make_gui(controller, write_function);
+  
+  return (LV2UI_Handle)widget;
 }
 
 static void cleanup(LV2UI_Handle ui) {
@@ -75,7 +77,7 @@ static void port_event(LV2UI_Handle ui,
   ((QAmp *)ui)->set_volume(*pval);
 }
 
-static const LV2UI_Descriptor descriptor_qt5 = {
+static const LV2UI_Descriptor descriptor = {
   QAMP_UI_URI, // URI
   instantiate, // instanciate function
   cleanup,     // cleanup function
