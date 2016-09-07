@@ -14,7 +14,7 @@ class QAmp : public QWidget
 Q_OBJECT
 
 public:
- QAmp(QWidget *parent = 0, Qt::WindowFlags wflags = 0);
+  QAmp(QWidget *parent = 0, Qt::WindowFlags wflags = 0);
   void set_volume(float volume);
   float get_volume() const;
   void set_controller(LV2UI_Controller func);

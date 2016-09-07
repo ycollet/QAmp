@@ -11,19 +11,6 @@
 static QApplication *qamp_qapp_instance = NULL;
 static unsigned int  qamp_qapp_refcount = 0;
 
-static LV2UI_Widget make_gui(LV2UI_Controller controller,
-			 LV2UI_Write_Function write_function) {
-  qDebug() << "make_gui called";
-  
-  QAmp * widget = new QAmp(NULL);
-
-  widget->set_controller(controller);
-  widget->set_write_function(write_function);
-  widget->show();
-
-  return (LV2UI_Widget)widget;
-}
-
 static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 				const char * plugin_uri,
 				const char * bundle_path,
@@ -44,10 +31,15 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
     qamp_qapp_instance = new QApplication(s_argc, (char **) s_argv);
   }
   qamp_qapp_refcount++;
+
+  QAmp * pWidget = new QAmp();
+
+  pWidget->set_controller(controller);
+  pWidget->set_write_function(write_function);
   
-  *widget = (LV2UI_Widget)make_gui(controller, write_function);
+  *widget = pWidget;
   
-  return (LV2UI_Handle)widget;
+  return (LV2UI_Handle)pWidget;
 }
 
 static void cleanup(LV2UI_Handle ui) {
@@ -67,7 +59,7 @@ static void port_event(LV2UI_Handle ui,
 		       uint32_t buffer_size,
 		       uint32_t format,
 		       const void * buffer) {
-  qDebug() << "port_event_called";
+  qDebug() << "port_event called";
   
   float * pval = (float *)buffer;
     
@@ -75,6 +67,8 @@ static void port_event(LV2UI_Handle ui,
   if ((port_index < 0) || (port_index >= QAMP_N_PORTS)) return;
 
   ((QAmp *)ui)->set_volume(*pval);
+  
+  qDebug() << "port_event exited";
 }
 
 static const LV2UI_Descriptor descriptor = {

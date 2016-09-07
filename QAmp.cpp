@@ -6,6 +6,8 @@
 #include "QAmp.h"
 
 QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
+  qDebug() << "QAmp constructor called";
+  
   setFixedHeight(100);
   setFixedWidth(100);
   
