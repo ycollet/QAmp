@@ -54,7 +54,7 @@ if (ENABLE_QT5)
                       ${Qt5Widgets_INCLUDE_DIRS}
                       ${Qt5Core_INCLUDE_DIRS})
 
-  add_definitions(-DQT5 ${Qt5Widgets_DEFINITIONS} ${Qt5Core_DEFINITIONS})
+  add_definitions(-D_REENTRANT -DQT_NO_DEBUG -DQT5 ${Qt5Widgets_DEFINITIONS} ${Qt5Core_DEFINITIONS})
   
   qt5_generate_moc(QAmp.h ${CMAKE_BINARY_DIR}/moc_QAmp_qt5.cpp)
   qt5_generate_moc(test/MainWindow.h ${CMAKE_BINARY_DIR}/moc_MainWindow_qt5.cpp)
@@ -83,7 +83,7 @@ else ()
   
   find_package(Qt4 4.8.0 REQUIRED QtGui QtCore)
 
-  add_definitions(${QT_DEFINITIONS})
+  add_definitions(-D_REENTRANT -DQT_NO_DEBUG ${QT_DEFINITIONS})
   
   include_directories(${CMAKE_SOURCE_DIR}
                       ${QT_INCLUDES})
