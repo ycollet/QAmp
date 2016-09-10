@@ -6,6 +6,7 @@
 #include "QAmp.h"
 
 QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
+  std::cerr << "QAmp constructor called" << std::endl;
   qDebug() << "QAmp constructor called";
   qDebug() << "QAmp: parent = " << parent << " wflags = " << wflags;
   
@@ -50,8 +51,6 @@ QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
   setLayout(vLayout);
   
   idleClosed = false;
-
-  show();
 }
 
 QAmp::~QAmp() {}
@@ -76,6 +75,7 @@ void QAmp::volumeChanged(int value) {
   gain = (float)value;
 
   qDebug() << "volumeChanged: gain = " << gain;
+  std::cerr << "volumeChanged: gain = " << gain << std::endl;
   
   if (write_function)
     write_function(controller, QAMP_GAIN, sizeof(gain), 0, &gain);

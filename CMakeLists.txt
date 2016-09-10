@@ -28,10 +28,8 @@ option(COMPILE_TEST "Compile the test executable" ON)
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIE")
-
-set(QAMP_SRCS amp.c)
-set(QAMP_UI_SRCS QAmp.cpp qamp_gui.cpp)
+set(QAMP_SRCS       amp.c)
+set(QAMP_UI_SRCS    QAmp.cpp qamp_gui.cpp)
 set(QAMP_UI_HEADERS QAmp.h)
 
 find_package(PkgConfig REQUIRED)

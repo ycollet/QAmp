@@ -25,7 +25,7 @@ public:
   bool isIdleClosed() const;
 protected:
   void closeEvent(QCloseEvent *pCloseEvent);
-private slots:
+public slots:
   void volumeChanged(int value);
 private:
   QDial *qampValue;
