@@ -23,8 +23,10 @@ project(QAmp C CXX)
 cmake_minimum_required(VERSION 3.0.3)
 
 option(ENABLE_QT5 "Activate Qt5 build" ON)
+option(COMPILE_TEST "Compile the test executable" ON)
 
 set(CMAKE_AUTOMOC OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIE")
 
@@ -42,19 +44,34 @@ include_directories("${CMAKE_SOURCE_DIR}/src"
 if (ENABLE_QT5)
   set(QTGUILV2 "Qt5")
   
-  find_package(Qt5 REQUIRED COMPONENTS Widgets)
+  find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
+
+  include_directories(${CMAKE_SOURCE_DIR}
+                      ${Qt5Widgets_INCLUDE_DIRS}
+                      ${Qt5Core_INCLUDE_DIRS})
+
+  add_definitions(-DQT5 ${Qt5Widgets_DEFINITIONS} ${Qt5Core_DEFINITIONS})
   
-  qt5_generate_moc(QAmp.h QAmp_qt5.cpp)
+  qt5_generate_moc(QAmp.h ${CMAKE_BINARY_DIR}/moc_QAmp_qt5.cpp)
+  qt5_generate_moc(test/MainWindow.h ${CMAKE_BINARY_DIR}/moc_MainWindow_qt5.cpp)
   
   add_library(qamp-gui SHARED ${QAMP_UI_SRCS}
                               ${QAMP_UI_HEADERS_MOC_QT5}
-  			      QAmp_qt5.cpp)
+  			      ${CMAKE_BINARY_DIR}/moc_QAmp_qt5.cpp)
   
   set_target_properties(qamp-gui PROPERTIES PREFIX "")
-  set_target_properties(qamp-gui PROPERTIES INCLUDE_DIRECTORIES "${Qt5Widgets_INCLUDE_DIRS}") 
-  set_target_properties(qamp-gui PROPERTIES COMPILE_DEFINITIONS "QT5")
   
   target_link_libraries(qamp-gui ${Qt5Widgets_LIBRARIES} ${LV2_LDFLAGS})
+
+  if (COMPILE_TEST)
+    add_executable(main-test test/main-test.cpp
+                             test/MainWindow.cpp
+			     ${CMAKE_BINARY_DIR}/moc_MainWindow_qt5.cpp
+			     ${CMAKE_BINARY_DIR}/moc_QAmp_qt5.cpp
+			     QAmp.cpp)
+  endif ()
+  
+  target_link_libraries(main-test ${Qt5Widgets_LIBRARIES} ${Qt5Core_LIBRARIES})
   
   install(TARGETS qamp-gui
           DESTINATION lib64/lv2/qamp.lv2)
@@ -62,17 +79,32 @@ else ()
   set(QTGUILV2 "Qt4")
   
   find_package(Qt4 4.8.0 REQUIRED QtGui QtCore)
+
+  add_definitions(${QT_DEFINITIONS})
   
-  qt4_generate_moc(QAmp.h QAmp_qt4.cpp)
+  include_directories(${CMAKE_SOURCE_DIR}
+                      ${QT_INCLUDES})
+  
+  qt4_generate_moc(QAmp.h ${CMAKE_BINARY_DIR}/moc_QAmp_qt4.cpp)
+  qt4_generate_moc(MainWindow.h ${CMAKE_BINARY_DIR}/moc_MainWindow_qt4.cpp)
   
   add_library(qamp-gui SHARED ${QAMP_UI_SRCS}
                               ${QAMP_UI_HEADERS_MOC_QT4}
-			      QAmp_qt4.cpp)
+			      ${CMAKE_BINARY_DIR}/moc_QAmp_qt4.cpp)
   
   set_target_properties(qamp-gui PROPERTIES PREFIX "")
-  set_target_properties(qamp-gui PROPERTIES INCLUDE_DIRECTORIES "${QT_QTGUI_INCLUDE_DIR};${QT_QTCORE_INCLUDE_DIR}")
   
   target_link_libraries(qamp-gui ${QT_QTGUI_LIBRARY} ${QT_CORE_LIBRARY} ${LV2_LDFLAGS})
+
+  if (COMPILE_TEST)
+    add_executable(main-test test/main-test.cpp
+                             test/MainWindow.cpp
+  			     ${CMAKE_BINARY_DIR}/moc_MainWindow_qt4.cpp
+			     ${CMAKE_BINARY_DIR}/moc_QAmp_qt4.cpp
+			     QAmp.cpp)
+  endif()
+  
+  target_link_libraries(main-test ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY})
   
   install(TARGETS qamp-gui
           DESTINATION lib64/lv2/qamp.lv2)

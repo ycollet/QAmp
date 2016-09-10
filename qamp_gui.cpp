@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 #include <QApplication>
 #include <QDebug>
@@ -20,7 +21,7 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 				const LV2_Feature * const * features) {
   qDebug() << "instanciate called";
   
-  if (strcmp(plugin_uri, QAMP_URI) != 0) {
+  if (std::strcmp(plugin_uri, QAMP_URI) != 0) {
     std::cerr << "QAMP_UI error: this GUI does not support plugin with URI " << plugin_uri << std::endl;
     return NULL;
   }
@@ -39,7 +40,7 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
   
   *widget = pWidget;
   
-  return (LV2UI_Handle)pWidget;
+  return pWidget;
 }
 
 static void cleanup(LV2UI_Handle ui) {
@@ -60,23 +61,79 @@ static void port_event(LV2UI_Handle ui,
 		       uint32_t format,
 		       const void * buffer) {
   qDebug() << "port_event called";
-  
-  float * pval = (float *)buffer;
-    
-  if (format != 0) return;
-  if ((port_index < 0) || (port_index >= QAMP_N_PORTS)) return;
 
-  ((QAmp *)ui)->set_volume(*pval);
+  QAmp *pWidget = static_cast<QAmp *> (ui);
+  if (pWidget)
+    pWidget->port_event(port_index, buffer_size, format, buffer);
   
   qDebug() << "port_event exited";
 }
 
+int qamp_lv2ui_show(LV2UI_Handle ui) {
+  qDebug() << "lv2ui_show called";
+  
+  QAmp *pWidget = static_cast<QAmp *>(ui);
+  if (pWidget) {
+    pWidget->show();
+    pWidget->raise();
+    pWidget->activateWindow();
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+int qamp_lv2ui_hide(LV2UI_Handle ui) {
+  qDebug() << "lv2ui_hide called";
+    
+  QAmp *pWidget = static_cast<QAmp *>(ui);
+  if (pWidget) {
+    pWidget->hide();
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+int qamp_lv2ui_idle(LV2UI_Handle ui) {
+  qDebug() << "lv2ui_idle called";
+  
+  QAmp *pWidget = static_cast<QAmp *>(ui);
+  if (pWidget && !pWidget->isIdleClosed()) {
+    QApplication::processEvents();
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+static const LV2UI_Show_Interface qamp_lv2ui_show_interface = {
+  qamp_lv2ui_show,
+  qamp_lv2ui_hide
+};
+
+static const LV2UI_Idle_Interface qamp_lv2ui_idle_interface = {
+  qamp_lv2ui_idle
+};
+
+static const void *extension_data(const char *uri) {
+  qDebug() << "extension_data called";
+  
+  if (std::strcmp(uri, LV2_UI__idleInterface) == 0)
+    return (void *) &qamp_lv2ui_idle_interface;
+  else
+    if (std::strcmp(uri, LV2_UI__showInterface) == 0)
+      return (void *) &qamp_lv2ui_show_interface;
+    else
+      return NULL;
+}
+
 static const LV2UI_Descriptor descriptor = {
-  QAMP_UI_URI, // URI
-  instantiate, // instanciate function
-  cleanup,     // cleanup function
-  port_event,  // port_event function
-  NULL         // extension_data function
+  QAMP_UI_URI,   // URI
+  instantiate,   // instanciate function
+  cleanup,       // cleanup function
+  port_event,    // port_event function
+  extension_data // extension_data function
 };
 
 LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)

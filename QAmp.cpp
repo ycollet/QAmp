@@ -7,9 +7,33 @@
 
 QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
   qDebug() << "QAmp constructor called";
+  qDebug() << "QAmp: parent = " << parent << " wflags = " << wflags;
   
-  setFixedHeight(100);
-  setFixedWidth(100);
+#if QT_VERSION >= 0x050000
+  // HACK: Dark themes grayed/disabled color group fix...
+  QPalette pal;
+  if (pal.base().color().value() < 0x7f) {
+    const QColor& color = pal.window().color();
+    const int iGroups = int(QPalette::Active | QPalette::Inactive) + 1;
+    for (int i = 0; i < iGroups; ++i) {
+      const QPalette::ColorGroup group = QPalette::ColorGroup(i);
+      pal.setBrush(group, QPalette::Light,    color.lighter(150));
+      pal.setBrush(group, QPalette::Midlight, color.lighter(120));
+      pal.setBrush(group, QPalette::Dark,     color.darker(150));
+      pal.setBrush(group, QPalette::Mid,      color.darker(120));
+      pal.setBrush(group, QPalette::Shadow,   color.darker(200));
+    }
+    pal.setColor(QPalette::Disabled, QPalette::ButtonText, pal.mid().color());
+    QWidget::setPalette(pal);
+  }
+#endif
+  //setFixedHeight(100);
+  //setFixedWidth(100);
+
+  resize(100, 100);
+  
+  write_function = NULL;
+  controller = NULL;
   
   qampValue = new QDial();
   qampValue->setRange(-100, 100);
@@ -25,8 +49,12 @@ QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
   
   setLayout(vLayout);
   
-  setWindowTitle(tr("QAmp"));
+  idleClosed = false;
+
+  show();
 }
+
+QAmp::~QAmp() {}
 
 void QAmp::set_volume(float volume) {
   qampValue->setValue(volume);
@@ -46,5 +74,29 @@ void QAmp::set_write_function(LV2UI_Write_Function func) {
 
 void QAmp::volumeChanged(int value) {
   gain = (float)value;
-  write_function(controller, QAMP_GAIN, sizeof(gain), 0, &gain);
+
+  qDebug() << "volumeChanged: gain = " << gain;
+  
+  if (write_function)
+    write_function(controller, QAMP_GAIN, sizeof(gain), 0, &gain);
+}
+
+void QAmp::port_event(uint32_t port_index, uint32_t buffer_size,
+		      uint32_t format, const void *buffer) {
+  if (format == 0 && buffer_size == sizeof(float)) {
+    float fValue = *(float *) buffer;
+    gain = fValue;
+  }
+}
+
+// Close event handler.
+void QAmp::closeEvent(QCloseEvent *pCloseEvent) {
+  closeEvent(pCloseEvent);
+  
+  if (pCloseEvent->isAccepted())
+    idleClosed = true;
+}
+
+bool QAmp::isIdleClosed() const {
+  return idleClosed;
 }
