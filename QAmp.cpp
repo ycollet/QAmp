@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include <QCloseEvent>
 #include <QDebug>
 
 #include "amp.h"
@@ -36,7 +37,7 @@ QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
   write_function = NULL;
   controller = NULL;
   
-  qampValue = new QDial();
+  qampValue = new QDial(this);
   qampValue->setRange(-100, 100);
   qampValue->setSingleStep(1);
   qampValue->setValue(90);

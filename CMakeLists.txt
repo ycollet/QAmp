@@ -28,9 +28,8 @@ option(COMPILE_TEST "Compile the test executable" ON)
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(QAMP_SRCS       amp.c)
-set(QAMP_UI_SRCS    QAmp.cpp qamp_gui.cpp)
-set(QAMP_UI_HEADERS QAmp.h)
+set(QAMP_SRCS    amp.c)
+set(QAMP_UI_SRCS QAmp.cpp qamp_gui.cpp)
 
 find_package(PkgConfig REQUIRED)
 
@@ -44,6 +43,13 @@ if (ENABLE_QT5)
   
   find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
 
+  message(STATUS "DEBUG: Qt5Widgets_INCLUDE_DIRS = ${Qt5Widgets_INCLUDE_DIRS}")
+  message(STATUS "DEBUG: Qt5Core_INCLUDE_DIRS = ${Qt5Core_INCLUDE_DIRS}")
+  message(STATUS "DEBUG: Qt5Widgets_DEFINITIONS = ${Qt5Widgets_DEFINITIONS}")
+  message(STATUS "DEBUG: Qt5Core_DEFINITIONS = ${Qt5Core_DEFINITIONS}")
+  message(STATUS "DEBUG: Qt5Widgets_LIBRARIES = ${Qt5Widgets_LIBRARIES}")
+  message(STATUS "DEBUG: Qt5Core_LIBRARIES = ${Qt5Core_LIBRARIES}")
+  
   include_directories(${CMAKE_SOURCE_DIR}
                       ${Qt5Widgets_INCLUDE_DIRS}
                       ${Qt5Core_INCLUDE_DIRS})
@@ -54,12 +60,11 @@ if (ENABLE_QT5)
   qt5_generate_moc(test/MainWindow.h ${CMAKE_BINARY_DIR}/moc_MainWindow_qt5.cpp)
   
   add_library(qamp-gui SHARED ${QAMP_UI_SRCS}
-                              ${QAMP_UI_HEADERS_MOC_QT5}
   			      ${CMAKE_BINARY_DIR}/moc_QAmp_qt5.cpp)
   
   set_target_properties(qamp-gui PROPERTIES PREFIX "")
   
-  target_link_libraries(qamp-gui ${Qt5Widgets_LIBRARIES} ${LV2_LDFLAGS})
+  target_link_libraries(qamp-gui ${Qt5Widgets_LIBRARIES} ${Qt5Core_LIBRARIES} ${LV2_LDFLAGS})
 
   if (COMPILE_TEST)
     add_executable(main-test test/main-test.cpp
@@ -87,7 +92,6 @@ else ()
   qt4_generate_moc(MainWindow.h ${CMAKE_BINARY_DIR}/moc_MainWindow_qt4.cpp)
   
   add_library(qamp-gui SHARED ${QAMP_UI_SRCS}
-                              ${QAMP_UI_HEADERS_MOC_QT4}
 			      ${CMAKE_BINARY_DIR}/moc_QAmp_qt4.cpp)
   
   set_target_properties(qamp-gui PROPERTIES PREFIX "")
