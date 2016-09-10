@@ -26,7 +26,7 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
     return NULL;
   }
 
-  if (qamp_qapp_instance == NULL) {
+  if (qApp == NULL && qamp_qapp_instance == NULL) {
     static int s_argc = 1;
     static const char *s_argv[] = { __func__, NULL };
     qamp_qapp_instance = new QApplication(s_argc, (char **) s_argv);
