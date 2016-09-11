@@ -6,7 +6,7 @@
 
 #include <lv2/lv2plug.in/ns/extensions/ui/ui.h>
 
-#include "amp.h"
+#include "qamp-audio.h"
 #include "QAmp.h"
 
 static QApplication *qamp_qapp_instance = NULL;
@@ -19,7 +19,9 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 				LV2UI_Controller controller,
 				LV2UI_Widget * widget,
 				const LV2_Feature * const * features) {
+#ifdef DEBUG
   std::cerr << "instanciate called" << std::endl;
+#endif
   
   if (std::strcmp(plugin_uri, QAMP_URI) != 0) {
     std::cerr << "QAMP_UI error: this GUI does not support plugin with URI " << plugin_uri << std::endl;
@@ -45,7 +47,10 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 }
 
 static void cleanup(LV2UI_Handle ui) {
+#ifdef DEBUG
   std::cerr << "cleanup called" << std::endl;
+#endif
+  
   QWidget *pWidget = static_cast<QWidget *> (ui);
   if (pWidget) {
     delete pWidget;
@@ -54,7 +59,6 @@ static void cleanup(LV2UI_Handle ui) {
       qamp_qapp_instance = NULL;
     }
   }
-  std::cerr << "cleanup exited" << std::endl;
 }
 
 static void port_event(LV2UI_Handle ui,
@@ -62,17 +66,19 @@ static void port_event(LV2UI_Handle ui,
 		       uint32_t buffer_size,
 		       uint32_t format,
 		       const void * buffer) {
+#ifdef DEBUG
   std::cerr << "port_event called" << std::endl;
-
+#endif
+  
   QAmp *pWidget = static_cast<QAmp *> (ui);
   if (pWidget)
     pWidget->port_event(port_index, buffer_size, format, buffer);
-  
-  std::cerr << "port_event exited" << std::endl;
 }
 
 int qamp_lv2ui_show(LV2UI_Handle ui) {
+#ifdef DEBUG
   std::cerr << "show called" << std::endl;
+#endif
   
   QAmp *pWidget = static_cast<QAmp *>(ui);
   if (pWidget) {
@@ -86,8 +92,10 @@ int qamp_lv2ui_show(LV2UI_Handle ui) {
 }
 
 int qamp_lv2ui_hide(LV2UI_Handle ui) {
+#ifdef DEBUG
   std::cerr << "hide called" << std::endl;
-    
+#endif
+  
   QAmp *pWidget = static_cast<QAmp *>(ui);
   if (pWidget) {
     pWidget->hide();
@@ -98,7 +106,9 @@ int qamp_lv2ui_hide(LV2UI_Handle ui) {
 }
 
 int qamp_lv2ui_idle(LV2UI_Handle ui) {
+#ifdef DEBUG
   std::cerr << "idle called" << std::endl;
+#endif
   
   QAmp *pWidget = static_cast<QAmp *>(ui);
   if (pWidget && !pWidget->isIdleClosed()) {
@@ -119,7 +129,9 @@ static const LV2UI_Idle_Interface qamp_lv2ui_idle_interface = {
 };
 
 static const void *extension_data(const char *uri) {
+#ifdef DEBUG
   std::cerr << "extension_data called" << std::endl;
+#endif
   
   if (std::strcmp(uri, LV2_UI__idleInterface) == 0)
     return (void *) &qamp_lv2ui_idle_interface;
@@ -140,7 +152,9 @@ static const LV2UI_Descriptor descriptor = {
 
 LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 {
+#ifdef DEBUG
   std::cerr << "descriptor called" << std::endl;
+#endif
   
   switch (index) {
   case 0:

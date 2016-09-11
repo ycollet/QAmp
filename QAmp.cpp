@@ -3,13 +3,10 @@
 #include <QCloseEvent>
 #include <QDebug>
 
-#include "qamp.h"
+#include "qamp-audio.h"
 #include "QAmp.h"
 
 QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
-  std::cerr << "QAmp constructor called" << std::endl;
-  std::cerr << "QAmp: parent = " << parent << " wflags = " << wflags << std::endl;
-  
 #if QT_VERSION >= 0x050000
   // HACK: Dark themes grayed/disabled color group fix...
   QPalette pal;
@@ -51,8 +48,6 @@ QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {
   setLayout(vLayout);
   
   idleClosed = false;
-
-  std::cerr << "QAmp: constructor exited" << std::endl;
 }
 
 QAmp::~QAmp() {}
@@ -74,9 +69,10 @@ void QAmp::set_write_function(LV2UI_Write_Function func) {
 }
 
 void QAmp::volumeChanged(int value) {
+#ifdef DEBUG
+  std::cerr << "volumeChanged: gain = " << value << std::endl;
+#endif
   gain = (float)value;
-
-  std::cerr << "volumeChanged: gain = " << gain << std::endl;
   
   if (write_function)
     write_function(controller, QAMP_GAIN, sizeof(gain), 0, &gain);
@@ -84,25 +80,23 @@ void QAmp::volumeChanged(int value) {
 
 void QAmp::port_event(uint32_t port_index, uint32_t buffer_size,
 		      uint32_t format, const void *buffer) {
+#ifdef DEBUG
   std::cerr << "port_event: called" << std::endl;
+#endif
   if (format == 0 && buffer_size == sizeof(float)) {
     float fValue = *(float *) buffer;
     gain = fValue;
   }
-  std::cerr << "port_event: exited" << std::endl;
 }
 
 // Close event handler.
 void QAmp::closeEvent(QCloseEvent *pCloseEvent) {
-  std::cerr << "closeEvent: called" << std::endl;
   closeEvent(pCloseEvent);
   
   if (pCloseEvent->isAccepted())
     idleClosed = true;
-  std::cerr << "closeEvent: exited" << std::endl;
 }
 
 bool QAmp::isIdleClosed() const {
-  std::cerr << "isIdleClosed: called" << std::endl;
   return idleClosed;
 }

@@ -28,8 +28,8 @@ option(COMPILE_TEST "Compile the test executable" ON)
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(QAMP_SRCS    qamp.c)
-set(QAMP_UI_SRCS QAmp.cpp qamp_gui.cpp)
+set(QAMP_SRCS    qamp-audio.c)
+set(QAMP_UI_SRCS QAmp.cpp qamp-gui.cpp)
 
 find_package(PkgConfig REQUIRED)
 
@@ -49,11 +49,11 @@ if (ENABLE_QT5)
 
   add_definitions(-D_REENTRANT -DQT_NO_DEBUG -DQT5 ${Qt5Widgets_DEFINITIONS} ${Qt5Core_DEFINITIONS})
   
-  qt5_generate_moc(QAmp.h ${CMAKE_BINARY_DIR}/moc_QAmp_qt5.cpp)
-  qt5_generate_moc(test/MainWindow.h ${CMAKE_BINARY_DIR}/moc_MainWindow_qt5.cpp)
+  qt5_generate_moc(QAmp.h ${CMAKE_BINARY_DIR}/moc-QAmp-qt5.cpp)
+  qt5_generate_moc(test/MainWindow.h ${CMAKE_BINARY_DIR}/moc-MainWindow-qt5.cpp)
   
   add_library(qamp-gui SHARED ${QAMP_UI_SRCS}
-  			      ${CMAKE_BINARY_DIR}/moc_QAmp_qt5.cpp)
+  			      ${CMAKE_BINARY_DIR}/moc-QAmp-qt5.cpp)
   
   set_target_properties(qamp-gui PROPERTIES PREFIX "")
   
@@ -62,8 +62,8 @@ if (ENABLE_QT5)
   if (COMPILE_TEST)
     add_executable(main-test test/main-test.cpp
                              test/MainWindow.cpp
-			     ${CMAKE_BINARY_DIR}/moc_MainWindow_qt5.cpp
-			     ${CMAKE_BINARY_DIR}/moc_QAmp_qt5.cpp
+			     ${CMAKE_BINARY_DIR}/moc-MainWindow-qt5.cpp
+			     ${CMAKE_BINARY_DIR}/moc-QAmp-qt5.cpp
 			     QAmp.cpp)
   endif ()
   
@@ -81,11 +81,11 @@ else ()
   include_directories(${CMAKE_SOURCE_DIR}
                       ${QT_INCLUDES})
   
-  qt4_generate_moc(QAmp.h ${CMAKE_BINARY_DIR}/moc_QAmp_qt4.cpp)
-  qt4_generate_moc(MainWindow.h ${CMAKE_BINARY_DIR}/moc_MainWindow_qt4.cpp)
+  qt4_generate_moc(QAmp.h ${CMAKE_BINARY_DIR}/moc-QAmp-qt4.cpp)
+  qt4_generate_moc(MainWindow.h ${CMAKE_BINARY_DIR}/moc-MainWindow-qt4.cpp)
   
   add_library(qamp-gui SHARED ${QAMP_UI_SRCS}
-			      ${CMAKE_BINARY_DIR}/moc_QAmp_qt4.cpp)
+			      ${CMAKE_BINARY_DIR}/moc-QAmp-qt4.cpp)
   
   set_target_properties(qamp-gui PROPERTIES PREFIX "")
   
@@ -94,8 +94,8 @@ else ()
   if (COMPILE_TEST)
     add_executable(main-test test/main-test.cpp
                              test/MainWindow.cpp
-  			     ${CMAKE_BINARY_DIR}/moc_MainWindow_qt4.cpp
-			     ${CMAKE_BINARY_DIR}/moc_QAmp_qt4.cpp
+  			     ${CMAKE_BINARY_DIR}/moc-MainWindow-qt4.cpp
+			     ${CMAKE_BINARY_DIR}/moc-QAmp-qt4.cpp
 			     QAmp.cpp)
   endif()
   
@@ -106,15 +106,13 @@ else ()
 endif()
 
 add_library(qamp-audio SHARED ${QAMP_SRCS})
-set_target_properties(qamp PROPERTIES PREFIX "")
-target_link_libraries(qamp ${LV2_LDFLAGS})
+set_target_properties(qamp-audio PROPERTIES PREFIX "")
+target_link_libraries(qamp-audio ${LV2_LDFLAGS})
 
 configure_file(${CMAKE_SOURCE_DIR}/qamp.ttl ${CMAKE_BINARY_DIR}/qamp.ttl)
 
-install(TARGETS qamp
+install(TARGETS qamp-audio
         DESTINATION lib64/lv2/qamp.lv2)
 
 install(FILES ${CMAKE_BINARY_DIR}/qamp.ttl manifest.ttl
         DESTINATION lib64/lv2/qamp.lv2)
-
-
