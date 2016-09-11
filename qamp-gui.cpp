@@ -28,6 +28,11 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
     return NULL;
   }
 
+  /*
+    qApp is a Qt macro which returns a pointer to a qApplication if a qApplication singleton has been already
+    initialized.
+    If no qApplication is found, then, we need to start ours to allow the main event loop to run.
+   */
   if (qApp == NULL && qamp_qapp_instance == NULL) {
     static int s_argc = 1;
     static const char *s_argv[] = { __func__, NULL };
@@ -39,10 +44,15 @@ static LV2UI_Handle instantiate(const struct _LV2UI_Descriptor * descriptor,
 
   pWidget->set_controller(controller);
   pWidget->set_write_function(write_function);
-  
+
+  /*
+    We need to return 2 things:
+    - a widget (a pointer to QWidget (for Qt) or to GtkWidget (for Gtk) return via the variable 'widget'
+    - a structure which can handle a widget and several other data via return. Here, we just return the
+      widget variable.
+   */
   *widget = pWidget;
   
-  std::cerr << "instanciate exited" << std::endl;
   return pWidget;
 }
 
@@ -75,6 +85,11 @@ static void port_event(LV2UI_Handle ui,
     pWidget->port_event(port_index, buffer_size, format, buffer);
 }
 
+/*
+  Here, we implement the show / hide / idle parts required for UI responsiveness
+  The seems to have been introduced in lv2-1.10.
+  These elements are adapted from those of drumkv1.
+ */
 int qamp_lv2ui_show(LV2UI_Handle ui) {
 #ifdef DEBUG
   std::cerr << "show called" << std::endl;
@@ -150,6 +165,11 @@ static const LV2UI_Descriptor descriptor = {
   extension_data // extension_data function
 };
 
+/*
+  This function needs to have the name "lv2ui_descriptor" and needs to be tagged LV2_SYMBOL_EXPORT
+  because the host, when loading this plugin, will look for lv2ui_descriptor function to perform
+  the UI tasks.
+ */
 LV2_SYMBOL_EXPORT const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 {
 #ifdef DEBUG

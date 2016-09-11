@@ -24,6 +24,7 @@ cmake_minimum_required(VERSION 3.0.3)
 
 option(ENABLE_QT5 "Activate Qt5 build" ON)
 option(COMPILE_TEST "Compile the test executable" ON)
+option(ENABLE_DEBUG_MESSAGES "Activate debug messages" OFF)
 
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -31,12 +32,17 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(QAMP_SRCS    qamp-audio.c)
 set(QAMP_UI_SRCS QAmp.cpp qamp-gui.cpp)
 
+if (ENABLE_DEBUG_MESSAGES)
+  add_definitions(-DDEBUG)
+endif ()
+
 find_package(PkgConfig REQUIRED)
 
+# We check for version 1.10 for UI show / hide/ idle
 pkg_check_modules(LV2 REQUIRED lv2>=1.10)
 
-include_directories("${CMAKE_SOURCE_DIR}/src"
-		    "${LV2_INCLUDEDIR}")
+include_directories(${CMAKE_SOURCE_DIR}/src
+		    ${LV2_INCLUDEDIR})
 
 if (ENABLE_QT5)
   set(QTGUILV2 "Qt5")
@@ -57,7 +63,9 @@ if (ENABLE_QT5)
   
   set_target_properties(qamp-gui PROPERTIES PREFIX "")
   
-  target_link_libraries(qamp-gui ${Qt5Widgets_LIBRARIES} ${Qt5Core_LIBRARIES} ${LV2_LDFLAGS})
+  target_link_libraries(qamp-gui ${Qt5Widgets_LIBRARIES}
+                                 ${Qt5Core_LIBRARIES}
+				 ${LV2_LDFLAGS})
 
   if (COMPILE_TEST)
     add_executable(main-test test/main-test.cpp
@@ -67,7 +75,8 @@ if (ENABLE_QT5)
 			     QAmp.cpp)
   endif ()
   
-  target_link_libraries(main-test ${Qt5Widgets_LIBRARIES} ${Qt5Core_LIBRARIES})
+  target_link_libraries(main-test ${Qt5Widgets_LIBRARIES}
+                                  ${Qt5Core_LIBRARIES})
   
   install(TARGETS qamp-gui
           DESTINATION lib64/lv2/qamp.lv2)
@@ -89,7 +98,9 @@ else ()
   
   set_target_properties(qamp-gui PROPERTIES PREFIX "")
   
-  target_link_libraries(qamp-gui ${QT_QTGUI_LIBRARY} ${QT_CORE_LIBRARY} ${LV2_LDFLAGS})
+  target_link_libraries(qamp-gui ${QT_QTGUI_LIBRARY}
+                                 ${QT_CORE_LIBRARY}
+				 ${LV2_LDFLAGS})
 
   if (COMPILE_TEST)
     add_executable(main-test test/main-test.cpp
@@ -99,7 +110,8 @@ else ()
 			     QAmp.cpp)
   endif()
   
-  target_link_libraries(main-test ${QT_QTGUI_LIBRARY} ${QT_QTCORE_LIBRARY})
+  target_link_libraries(main-test ${QT_QTGUI_LIBRARY}
+                                  ${QT_QTCORE_LIBRARY})
   
   install(TARGETS qamp-gui
           DESTINATION lib64/lv2/qamp.lv2)
