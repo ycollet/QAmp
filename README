@@ -26,3 +26,6 @@ $ jalv.qt4 https://github.com/ycollet/qamp
 or
 $ jalv.qt5 https://github.com/ycollet/qamp
 ```
+TODO:
+* add a preset example
+* add a state example
