@@ -3,7 +3,7 @@
 #include <QCloseEvent>
 #include <QDebug>
 
-#include "amp.h"
+#include "qamp.h"
 #include "QAmp.h"
 
 QAmp::QAmp(QWidget *parent, Qt::WindowFlags wflags) : QWidget(parent, wflags) {

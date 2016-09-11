@@ -28,7 +28,7 @@ option(COMPILE_TEST "Compile the test executable" ON)
 set(CMAKE_AUTOMOC OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(QAMP_SRCS    amp.c)
+set(QAMP_SRCS    qamp.c)
 set(QAMP_UI_SRCS QAmp.cpp qamp_gui.cpp)
 
 find_package(PkgConfig REQUIRED)
@@ -42,13 +42,6 @@ if (ENABLE_QT5)
   set(QTGUILV2 "Qt5")
   
   find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
-
-  message(STATUS "DEBUG: Qt5Widgets_INCLUDE_DIRS = ${Qt5Widgets_INCLUDE_DIRS}")
-  message(STATUS "DEBUG: Qt5Core_INCLUDE_DIRS = ${Qt5Core_INCLUDE_DIRS}")
-  message(STATUS "DEBUG: Qt5Widgets_DEFINITIONS = ${Qt5Widgets_DEFINITIONS}")
-  message(STATUS "DEBUG: Qt5Core_DEFINITIONS = ${Qt5Core_DEFINITIONS}")
-  message(STATUS "DEBUG: Qt5Widgets_LIBRARIES = ${Qt5Widgets_LIBRARIES}")
-  message(STATUS "DEBUG: Qt5Core_LIBRARIES = ${Qt5Core_LIBRARIES}")
   
   include_directories(${CMAKE_SOURCE_DIR}
                       ${Qt5Widgets_INCLUDE_DIRS}
@@ -112,7 +105,7 @@ else ()
           DESTINATION lib64/lv2/qamp.lv2)
 endif()
 
-add_library(qamp SHARED ${QAMP_SRCS})
+add_library(qamp-audio SHARED ${QAMP_SRCS})
 set_target_properties(qamp PROPERTIES PREFIX "")
 target_link_libraries(qamp ${LV2_LDFLAGS})
 

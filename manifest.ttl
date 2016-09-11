@@ -5,5 +5,5 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <https://github.com/ycollet/qamp> a lv2:Plugin ;
-                                  lv2:binary   <qamp.so> ;
+                                  lv2:binary   <qamp-audio.so> ;
                                   rdfs:seeAlso <qamp.ttl> .

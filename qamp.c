@@ -3,7 +3,7 @@
 
 #include <lv2.h>
 
-#include "amp.h"
+#include "qamp.h"
 
 #define DB_CO(g) ((g) > -90.0f ? powf(10.0f, (g) * 0.05f) : 0.0f)
 
