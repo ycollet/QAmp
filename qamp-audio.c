@@ -13,14 +13,20 @@ typedef struct {
   float *gain;
   float *input;
   float *output;
-} QAmp;
+} QAmp_data;
 
 static void cleanupAmp(LV2_Handle instance) {
+#ifdef DEBUG
+  fprintf(stderr, "cleanup called\n");
+#endif
   free(instance);
 }
 
 static void connectPortAmp(LV2_Handle instance, uint32_t port, void *data) {
-  QAmp *plugin = (QAmp *)instance;
+#ifdef DEBUG
+  fprintf(stderr, "connectPort called\n");
+#endif
+  QAmp_data *plugin = (QAmp_data *)instance;
 
   switch (port) {
   case QAMP_GAIN:
@@ -37,13 +43,19 @@ static void connectPortAmp(LV2_Handle instance, uint32_t port, void *data) {
 
 static LV2_Handle instantiateAmp(const LV2_Descriptor *descriptor, double s_rate, const char *path,
 				 const LV2_Feature * const* features) {
-  QAmp *plugin_data = (QAmp *)malloc(sizeof(QAmp));
+#ifdef DEBUG
+  fprintf(stderr, "instantiate called\n");
+#endif
+  QAmp_data *plugin_data = (QAmp_data *)malloc(sizeof(QAmp));
 
   return (LV2_Handle)plugin_data;
 }
 
 static void runAmp(LV2_Handle instance, uint32_t sample_count) {
-  QAmp *plugin_data = (QAmp *)instance;
+#ifdef DEBUG
+  fprintf(stderr, "run called\n");
+#endif
+  QAmp_data *plugin_data = (QAmp_data *)instance;
 
   const float gain = *(plugin_data->gain);
   const float * const input = plugin_data->input;
@@ -55,7 +67,10 @@ static void runAmp(LV2_Handle instance, uint32_t sample_count) {
   }
 }
 
-static void init() {
+static void initAmp() {
+#ifdef DEBUG
+  fprintf(stderr, "init called\n");
+#endif
   ampDescriptor = (LV2_Descriptor *)malloc(sizeof(LV2_Descriptor));
 
   ampDescriptor->URI            = QAMP_URI;
@@ -68,8 +83,13 @@ static void init() {
   ampDescriptor->extension_data = NULL;
 }
 
+/*
+  This function needs to have the name "lv2_descriptor" and needs to be tagged LV2_SYMBOL_EXPORT
+  because the host, when loading this plugin, will look for lv2_descriptor function to perform
+  the audio tasks.
+ */
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) {
-  if (!ampDescriptor) init();
+  if (!ampDescriptor) initAmp();
   
   switch (index) {
   case 0:
